@@ -100,9 +100,9 @@ function createDinoObjects() {
            All birds are Dinosaurs.`
         : `
       Species: ${dino.species} <br>
-      Weight Difference: ${weightDiff} lbs <br>
-      Height Difference: ${heightDiff} inches <br>
-      Diet Difference: ${dietDiff}
+      Weight Difference: ${weightDiff} lbs than you <br>
+      Height Difference: ${heightDiff} inches than you <br>
+      Diet Difference: ${humanInfo.diet}(You) VS ${dietDiff}
     `;
     arrayDinos.push(new Dino(dino));
   }
