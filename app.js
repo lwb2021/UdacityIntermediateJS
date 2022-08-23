@@ -1,3 +1,4 @@
+const HUMAN_INDEX = 4;
 const rawDinos = [
   {
     species: "Triceratops",
@@ -83,107 +84,114 @@ function Dino(dinoInfo) {
   this.when = dinoInfo.when;
   this.fact = dinoInfo.fact;
   this.url = `images/${this.species.toLowerCase()}.png`;
+  this.comparedDetails = dinoInfo.comparedDetails;
 }
 
 // Create Dino Objects
-(function createDinoObjects() {
+function createDinoObjects() {
   const arrayDinos = [];
   for (const dino of rawDinos) {
+    const heightDiff = compareHeight(dino);
+    const weightDiff = compareWeight(dino);
+    const dietDiff = compareDiet(dino);
+    dino.comparedDetails =
+      dino.species === "Pigeon"
+        ? `Species: ${dino.species} <br> 
+           All birds are Dinosaurs.`
+        : `
+      Species: ${dino.species} <br>
+      Weight Difference: ${weightDiff} lbs <br>
+      Height Difference: ${heightDiff} inches <br>
+      Diet Difference: ${dietDiff}
+    `;
     arrayDinos.push(new Dino(dino));
   }
   window.arrayDinos = arrayDinos;
-})();
+}
 
 // Create Human Object
 function Human(humanInfo) {
-  this.name = humanInfo.name;
-  this.url = `images/human.png`;
-}
-
-function hideForm() {
-  const form = document.getElementById("dino-compare");
-  form.style.display = "none";
-}
-
-function prepareData() {
-  return {
-    heightDiff: compareHeight(),
-    weightDiff: compareWeight(),
-    dietDiff: compareDiet(),
-  };
+  this.comparedDetails = humanInfo.comparedDetails;
+  this.feetHeight = humanInfo.feetHeight;
+  this.inchHeight = humanInfo.inchHeight;
+  this.weight = humanInfo.weight;
+  this.diet = humanInfo.diet;
+  this.url = humanInfo.url;
 }
 
 // Use IIFE to get human data from form
 (function () {
   const grid = document.getElementById("grid");
   const button = document.getElementById("btn");
-  console.log(" 123 ", grid);
+
   window.grid = grid;
 
   button.addEventListener("click", () => {
-    // showTiles();
     const nameInput = document.getElementById("name");
     const feetHeight = document.getElementById("feet");
     const inchHeight = document.getElementById("inches");
     const weight = document.getElementById("weight");
     const diet = document.getElementById("diet");
-    const userInfo = {
-      name: nameInput.value,
+    const humanInfo = new Human({
+      comparedDetails: nameInput.value,
       feetHeight: feetHeight.value,
       inchHeight: inchHeight.value,
       weight: weight.value,
       diet: diet.value,
-    };
-    window.userInfo = userInfo;
-
+      url: `images/human.png`,
+    });
+    window.humanInfo = humanInfo;
     hideForm();
-    const { heightDiff, weightDiff, dietDiff } = prepareData();
+    createDinoObjects();
+    generateTiles();
   });
 })();
 
-// Create Dino Compare Method 1
-// NOTE: Weight in JSON file is in lbs, height in inches.
-function compareHeight() {
-  const heightDiff = {};
-  for (const dino of arrayDinos) {
-    heightDiff[dino.species] =
-      (dino.height * 12 - userInfo.feetHeight * 12 - userInfo.inchHeight) / 12;
-  }
-  return heightDiff;
+// Create height compare method
+function compareHeight(dino) {
+  return (
+    (dino.height * 12 - humanInfo.feetHeight * 12 - humanInfo.inchHeight) / 12
+  );
 }
 
-// Create Dino Compare Method 2
-// NOTE: Weight in JSON file is in lbs, height in inches.
-function compareWeight() {
-  const weightDiff = {};
-  for (const dino of arrayDinos) {
-    weightDiff[dino.species] = dino.weight - userInfo.weight;
-  }
-  return weightDiff;
+// Create weight compare method
+function compareWeight(dino) {
+  return dino.weight - humanInfo.weight;
 }
 
-// Create Dino Compare Method 3
-// NOTE: Weight in JSON file is in lbs, height in inches.
-function compareDiet() {
-  const dietDiff = {};
-  for (const dino of arrayDinos) {
-    dietDiff[dino.species] = dino.diet;
-  }
-  return dietDiff;
+// Create diet compare method
+function compareDiet(dino) {
+  return dino.diet;
 }
 
 // Generate Tiles for each Dino in Array
-function showTiles() {
-  const gridItem = document.createElement("div");
-  const para = document.createElement("p");
-  para.innerText = "This is a paragraph.";
-  gridItem.appendChild(para);
-  gridItem.classList.add("grid-item");
-  grid.appendChild(gridItem);
+function generateTiles() {
+  let i = 0;
+  while (arrayDinos.length !== 0) {
+    const currentObj =
+      i === HUMAN_INDEX
+        ? humanInfo
+        : arrayDinos.splice(Math.random() * arrayDinos.length, 1)[0];
+
+    const gridItem = document.createElement("div");
+    const fullText = document.createElement("p");
+    fullText.innerHTML = currentObj.comparedDetails;
+    gridItem.appendChild(fullText);
+    gridItem.classList.add("grid-item");
+
+    const img = document.createElement("img");
+    img.src = currentObj.url;
+
+    gridItem.appendChild(img);
+
+    grid.appendChild(gridItem);
+
+    i++;
+  }
 }
 
-// Add tiles to DOM
-
 // Remove form from screen
-
-// On button click, prepare and display infographic
+function hideForm() {
+  const form = document.getElementById("dino-compare");
+  form.style.display = "none";
+}
