@@ -133,10 +133,11 @@ function Human(humanInfo) {
     const weight = document.getElementById("weight");
     const diet = document.getElementById("diet");
     const humanInfo = new Human({
-      comparedDetails: nameInput.value,
-      feetHeight: feetHeight.value,
-      inchHeight: inchHeight.value,
-      weight: weight.value,
+      comparedDetails:
+        nameInput.value.length > 0 ? nameInput.value : "Please enter your name",
+      feetHeight: feetHeight.value > 0 ? feetHeight.value : 0,
+      inchHeight: inchHeight.value > 0 ? inchHeight.value : 0,
+      weight: weight.value > 0 ? weight.value : 0,
       diet: diet.value,
       url: `images/human.png`,
     });
@@ -183,6 +184,16 @@ function generateTiles() {
     img.src = currentObj.url;
 
     gridItem.appendChild(img);
+
+    if (i !== HUMAN_INDEX) {
+      const additionalText = document.createElement("p");
+      additionalText.innerHTML = `
+      Where: ${currentObj.where} <br>
+      When: ${currentObj.when}
+    `;
+      additionalText.classList.add("hidden-p");
+      gridItem.appendChild(additionalText);
+    }
 
     grid.appendChild(gridItem);
 

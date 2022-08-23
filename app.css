@@ -103,6 +103,10 @@ p {
     padding-bottom: 1em;
 }
 
+.grid-item:hover .hidden-p {
+    display: block;
+}
+
 .grid-item p {
     background: rgba(000,000,000, .3);
     position: absolute;
@@ -114,6 +118,12 @@ p {
     font-size: 0.8em;
     font-weight: 600;
     color: #fff;
+}
+
+.grid-item .hidden-p {
+    display: none;
+    bottom: inherit !important; 
+    top: 0;
 }
 
 /* Form Styles */
