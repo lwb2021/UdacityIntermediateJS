@@ -96,17 +96,28 @@ function createDinoObjects() {
     const dietDiff = compareDiet(dino);
     dino.comparedDetails =
       dino.species === "Pigeon"
-        ? `Species: ${dino.species} <br> 
+        ? `<h3>Species: ${dino.species}</h3> <br> 
            All birds are Dinosaurs.`
         : `
-      Species: ${dino.species} <br>
+      <h3>Species: ${dino.species}</h3> <br>
       Weight Difference: ${weightDiff} lbs than you <br>
       Height Difference: ${heightDiff} inches than you <br>
-      Diet Difference: ${humanInfo.diet}(You) VS ${dietDiff}
+      Diet Difference: ${humanInfo.diet}(You) VS ${dietDiff} <br>
+      Fact: ${generateRandomFacts(dino)}
     `;
     arrayDinos.push(new Dino(dino));
   }
   window.arrayDinos = arrayDinos;
+}
+
+// generate random facts about the species
+function generateRandomFacts(dino) {
+  const randomFactsArray = [
+    `${dino.species} was found at ${dino.where}`,
+    `${dino.species} was found during ${dino.when}`,
+    `${dino.fact}`,
+  ];
+  return randomFactsArray[Math.floor(Math.random() * randomFactsArray.length)];
 }
 
 // Create Human Object
@@ -122,22 +133,21 @@ function Human(humanInfo) {
 // Use IIFE to get human data from form
 (function () {
   const grid = document.getElementById("grid");
-  const button = document.getElementById("btn");
-
   window.grid = grid;
 
-  button.addEventListener("click", () => {
+  const form = document.getElementById("dino-compare");
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
     const nameInput = document.getElementById("name");
     const feetHeight = document.getElementById("feet");
     const inchHeight = document.getElementById("inches");
     const weight = document.getElementById("weight");
     const diet = document.getElementById("diet");
     const humanInfo = new Human({
-      comparedDetails:
-        nameInput.value.length > 0 ? nameInput.value : "Please enter your name",
-      feetHeight: feetHeight.value > 0 ? feetHeight.value : 0,
-      inchHeight: inchHeight.value > 0 ? inchHeight.value : 0,
-      weight: weight.value > 0 ? weight.value : 0,
+      comparedDetails: `<h3>${nameInput.value}</h3>`,
+      feetHeight: feetHeight.value,
+      inchHeight: inchHeight.value,
+      weight: weight.value,
       diet: diet.value,
       url: `images/human.png`,
     });
