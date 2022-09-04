@@ -125,15 +125,48 @@ function Human(humanInfo) {
   this.comparedDetails = humanInfo.comparedDetails;
   this.feetHeight = humanInfo.feetHeight;
   this.inchHeight = humanInfo.inchHeight;
+  this.centimeterHeight = humanInfo.centimeterHeight;
   this.weight = humanInfo.weight;
   this.diet = humanInfo.diet;
   this.url = humanInfo.url;
 }
 
+// Switch the display status of the element
+function switchUnitDisplayStatus(element, isDisplayed = true) {
+  if (isDisplayed) {
+    element.style.setProperty("display", "inline");
+  } else {
+    element.style.setProperty("display", "none");
+  }
+}
+
 // Use IIFE to get human data from form
 (function () {
-  const grid = document.getElementById("grid");
-  window.grid = grid;
+  const unitSwitch = document.getElementById("unitSwitch");
+  unitSwitch.addEventListener("change", () => {
+    const feetLabel = document.getElementById("feetLabel");
+    const inchLabel = document.getElementById("inchLabel");
+    const metricLabel = document.getElementById("metricLabel");
+
+    const feetInput = document.getElementById("feet");
+    const inchInput = document.getElementById("inches");
+    const metricInput = document.getElementById("centimeter");
+    const inputArray = [feetInput, inchInput, metricInput];
+
+    // Display or hide the elements based on the selected choice
+    if (unitSwitch.value === "Metric") {
+      switchUnitDisplayStatus(feetLabel, false);
+      switchUnitDisplayStatus(inchLabel, false);
+      switchUnitDisplayStatus(metricLabel);
+    } else {
+      switchUnitDisplayStatus(metricLabel, false);
+      switchUnitDisplayStatus(feetLabel);
+      switchUnitDisplayStatus(inchLabel);
+    }
+
+    // Add or remove 'required' attributes to the shown and hidden input elements
+    inputArray.forEach((elem) => elem.toggleAttribute("required"));
+  });
 
   const form = document.getElementById("dino-compare");
   form.addEventListener("submit", (event) => {
@@ -141,25 +174,37 @@ function Human(humanInfo) {
     const nameInput = document.getElementById("name");
     const feetHeight = document.getElementById("feet");
     const inchHeight = document.getElementById("inches");
+    const centimeterHeight = document.getElementById("centimeter");
     const weight = document.getElementById("weight");
     const diet = document.getElementById("diet");
     const humanInfo = new Human({
       comparedDetails: `<h3>${nameInput.value}</h3>`,
       feetHeight: feetHeight.value,
       inchHeight: inchHeight.value,
+      centimeterHeight: centimeterHeight.value,
       weight: weight.value,
       diet: diet.value,
       url: `images/human.png`,
     });
     window.humanInfo = humanInfo;
+
+    // Hide the form
     hideForm();
+
+    // Create all the elements for the grid
     createDinoObjects();
+
+    // Add all the previously created elements to the grid
     generateTiles();
   });
 })();
 
 // Create height compare method
 function compareHeight(dino) {
+  const unitSwitch = document.getElementById("unitSwitch");
+  if (unitSwitch.value === "Metric") {
+    return dino.height - humanInfo.centimeterHeight / 30.48;
+  }
   return (
     (dino.height * 12 - humanInfo.feetHeight * 12 - humanInfo.inchHeight) / 12
   );
@@ -175,6 +220,37 @@ function compareDiet(dino) {
   return dino.diet;
 }
 
+// Create each single element for the grid
+function createSingleElement(currentObj) {
+  const gridItem = document.createElement("div");
+  const fullText = document.createElement("p");
+  const grid = document.getElementById("grid");
+
+  // Append comparison details to each element
+  fullText.innerHTML = currentObj.comparedDetails;
+  gridItem.appendChild(fullText);
+  gridItem.classList.add("grid-item");
+
+  // Insert the image to each element
+  const img = document.createElement("img");
+  img.src = currentObj.url;
+
+  gridItem.appendChild(img);
+
+  // verify the current object is a Dinosaur
+  if (currentObj.where && currentObj.when) {
+    const additionalText = document.createElement("p");
+    additionalText.innerHTML = `
+      Where: ${currentObj.where} <br>
+      When: ${currentObj.when}
+    `;
+    additionalText.classList.add("hidden-p");
+    gridItem.appendChild(additionalText);
+  }
+
+  grid.appendChild(gridItem);
+}
+
 // Generate Tiles for each Dino in Array
 function generateTiles() {
   let i = 0;
@@ -183,30 +259,7 @@ function generateTiles() {
       i === HUMAN_INDEX
         ? humanInfo
         : arrayDinos.splice(Math.random() * arrayDinos.length, 1)[0];
-
-    const gridItem = document.createElement("div");
-    const fullText = document.createElement("p");
-    fullText.innerHTML = currentObj.comparedDetails;
-    gridItem.appendChild(fullText);
-    gridItem.classList.add("grid-item");
-
-    const img = document.createElement("img");
-    img.src = currentObj.url;
-
-    gridItem.appendChild(img);
-
-    if (i !== HUMAN_INDEX) {
-      const additionalText = document.createElement("p");
-      additionalText.innerHTML = `
-      Where: ${currentObj.where} <br>
-      When: ${currentObj.when}
-    `;
-      additionalText.classList.add("hidden-p");
-      gridItem.appendChild(additionalText);
-    }
-
-    grid.appendChild(gridItem);
-
+    createSingleElement(currentObj);
     i++;
   }
 }
